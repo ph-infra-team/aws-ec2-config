@@ -1,0 +1,13 @@
+---
+ansible_connection: community.aws.aws_ssm
+ansible_aws_ssm_instance_id: "{{ instance_id }}"
+ansible_aws_ssm_region: us-east-1
+ansible_aws_ssm_bucket_name: "{{ awx_ssm_bucket_name | default(lookup('env', 'AWX_SSM_BUCKET_NAME')) }}"
+ansible_aws_ssm_bucket_sse_mode: aws:kms
+ansible_aws_ssm_bucket_sse_kms_key_id: "{{ awx_ssm_bucket_kms_key_id | default(lookup('env', 'AWX_SSM_BUCKET_KMS_KEY_ID') | default('arn:aws:kms:us-east-1:288821543174:key/457e2959-3208-4a57-90fc-ee1570bcdcb3', true), true) }}"
+ansible_aws_ssm_profile: "{{ aws_assume_role_profile | default('awx-assume-role') }}"
+ansible_aws_ssm_s3_addressing_style: virtual
+ansible_aws_ssm_timeout: 120
+ansible_remote_tmp: /tmp/.ansible/tmp
+ansible_shell_executable: /bin/sh
+ansible_python_interpreter: /usr/bin/python3

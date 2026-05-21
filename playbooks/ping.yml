@@ -1,0 +1,36 @@
+---
+- name: Test AWS EC2 access through SSM
+  hosts: linux
+  gather_facts: false
+
+  tasks:
+    - name: Confirm SSM command channel
+      ansible.builtin.raw: hostname
+      register: hostname_result
+      changed_when: false
+
+    - name: Confirm Python exists without module transfer
+      ansible.builtin.raw: /usr/bin/python3 --version
+      register: python_result
+      changed_when: false
+
+    - name: Confirm Python module execution through S3 transfer
+      ansible.builtin.command: /usr/bin/python3 --version
+      register: module_python_result
+      changed_when: false
+
+    - name: Confirm Ansible module ping
+      ansible.builtin.ping:
+      register: ansible_ping_result
+
+    - name: Show hostname
+      ansible.builtin.debug:
+        msg: "{{ hostname_result.stdout | regex_replace('\\x1b\\[[0-9;?]*[A-Za-z]', '') | trim }}"
+
+    - name: Show Python version
+      ansible.builtin.debug:
+        msg: "{{ module_python_result.stdout | trim }}"
+
+    - name: Show Ansible ping result
+      ansible.builtin.debug:
+        msg: "{{ ansible_ping_result.ping }}"

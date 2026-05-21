@@ -1,0 +1,56 @@
+---
+# AWX desired state for this automation repository.
+# Junior engineers may edit this file, but the trusted setup logic lives in
+# platform-awx-configure and is executed through the shared AWX app pipeline.
+
+awx_app_name: test-awx-aws-connect
+env: dev
+organization: platform-team
+aws_region: us-east-1
+aws_assume_role_profile: awx-assume-role
+
+controller_notifications_all: []
+
+controller_credentials_all:
+  - name: test-awx-aws-connect-assume-role
+    organization: platform-team
+    credential_type: "AWS Assume Role Profile"
+    inputs:
+      profile_name: "{{ aws_assume_role_profile }}"
+      role_arn: "{{ aws_assume_role_arn }}"
+      region: "{{ aws_region }}"
+
+controller_inventories_all: []
+controller_inventory_sources_all: []
+controller_schedules_all: []
+controller_workflow_job_templates_all: []
+
+controller_projects_all:
+  - name: test-awx-aws-connect
+    organization: platform-team
+    scm_type: git
+    scm_url: "http://gitlab.midhtech.local/infra_team/automation/test_awx_aws_connect.git"
+    scm_branch: main
+    credential: "{{ awx_scm_credential_name }}"
+    update_project: true
+
+controller_job_templates_all:
+  - name: test-awx-aws-connect-ping
+    description: "Validate private EC2 management through AWS SSM."
+    organization: platform-team
+    project: test-awx-aws-connect
+    job_type: run
+    playbook: playbooks/ping.yml
+    inventory: maas-ec2-dev
+    execution_environment: ee-aws-ssm
+    credentials:
+      - "{{ awx_base_aws_credential_name }}"
+      - test-awx-aws-connect-assume-role
+    concurrent_jobs_enabled: false
+    ask_variables_on_launch: true
+    ask_inventory_on_launch: false
+    ask_scm_branch_on_launch: false
+    limit: linux
+    verbosity: 1
+    extra_vars:
+      env: dev

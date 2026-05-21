@@ -1,0 +1,26 @@
+############################################
+# AWX App Automation Pipeline
+# Repo: infra_team/automation/test_awx_aws_connect
+#
+# Purpose:
+# - Uses the shared AWX app pipeline.
+# - Declares AWX resources in awx/team_vars.yml.
+# - Runs the trusted central AWX configure job.
+# - Syncs this project in AWX and can launch the SSM ping job.
+############################################
+
+include:
+  - project: infra_team/platform-pipelines
+    ref: main
+    file: ansible/awx-app.yml
+
+variables:
+  AWX_CONFIG_VARS_FILE: "awx/team_vars.yml"
+  AWX_CONFIGURE_JOB_TEMPLATE: "central-awx-configure-resources"
+  AWX_CLEANUP_JOB_TEMPLATE: "central-awx-cleanup-resources"
+  AWX_APP_PROJECT_NAME: "test-awx-aws-connect"
+  AWX_APP_JOB_TEMPLATE: "test-awx-aws-connect-ping"
+
+  # Set these as protected CI/CD variables if the names differ in AWX.
+  # AWX_SCM_CREDENTIAL_NAME: "platform-team Gitlab"
+  # AWX_AWS_CREDENTIAL_NAME: "aws-ssm-dev"
